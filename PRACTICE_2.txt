@@ -1,0 +1,46 @@
+<li> Problem #13:
+Write a query to display the average price of books which is belonging to ‘JAVA’ category with alias name “AVERAGEPRICE”.
+
+ANS)
+SELECT CATEGORY, ROUND(AVG( PRICE ), 2) AVERAGEPRICE
+FROM LMS_BOOK_DETAILS
+GROUP BY CATEGORY
+HAVING CATEGORY LIKE 'JAVA';
+
+
+<li> Problem #14:
+Write a query to display the supplier id, supplier name and email of the suppliers who are all having gmail account.
+
+ANS)
+SELECT SUPPLIER_ID, SUPPLIER_NAME, EMAIL
+FROM LMS_SUPPLIERS_DETAILS 
+WHERE EMAIL LIKE '%gmail.com%'
+
+
+<li> Problem#15:
+Write a query to display the supplier id, supplier name and contact details. Contact details can be either phone number or email or address with alias name “CONTACTDETAILS”. If phone number is null then display email, even if email also null then display the address of the supplier. Hint: Use Coalesce function. 
+
+ANS)
+
+SELECT SUPPLIER_ID, SUPPLIER_NAME, COALESCE(TO_CHAR(CONTACT), EMAIL, ADDRESS, 'N/A') CONTACTDETAILS
+FROM LMS_SUPPLIERS_DETAILS;
+
+<li> Problem#16:
+Write a query to display the supplier id, supplier name and contact.  If phone number is null then display ‘No’ else display ‘Yes’ with alias name “PHONENUMAVAILABLE”. Hint: Use ISNULL/COALESCE/NVL.
+
+ANS)
+select SUPPLIER_ID,SUPPLIER_NAME,case when CONTACT is NULL then 'NO' when CONTACT is not null then 'YES' end as PHONE_NUM_AVAILABLE from LMS_SUPPLIERS_DETAILS
+
+<li> Problem#17:
+Write a query to display the member id, member name, city and member status of members with the total fine paid by them with alias name “Fine”.
+
+ANS)
+SELECT LMS_MEMBERS.MEMBER_ID,LMS_MEMBERS.MEMBER_NAME,LMS_MEMBERS.CITY,LMS_MEMBERS.MEMBERSHIP_STATUS,
+SUM(LMS_FINE_DETAILS.FINE_AMOUNT) AS Fine
+FROM LMS_MEMBERS 
+JOIN LMS_BOOK_ISSUE ON (LMS_MEMBERS.MEMBER_ID = LMS_BOOK_ISSUE.MEMBER_ID)
+JOIN LMS_FINE_DETAILS ON(LMS_BOOK_ISSUE.FINE_RANGE = LMS_FINE_DETAILS.FINE_RANGE)
+GROUP BY LMS_MEMBERS.MEMBER_ID,LMS_MEMBERS.MEMBER_NAME,LMS_MEMBERS.CITY,LMS_MEMBERS.MEMBERSHIP_STATUS
+
+
+</ul>
