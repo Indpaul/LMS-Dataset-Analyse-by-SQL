@@ -1,0 +1,113 @@
+<li>Problem # 1:
+Write a query to display the member id, member name of the members, book code and book title of the books taken by them.
+
+ANS)
+SELECT MEMBER_ID,(SELECT MEMBER_NAME FROM LMS_MEMBERS WHERE MEMBER_ID=t1.MEMBER_ID )
+AS
+MEMBER_NAME,BOOK_CODE,(SELECT BOOK_TITLE FROM LMS_BOOK_DETAILS WHERE BOOK_CODE=t1.BOOK_CODE)
+AS
+BOOK_TITLE FROM LMS_BOOK_ISSUE t1
+
+
+<li>Problem # 2:
+Write a query to display the total number of books available in the library with alias name “NO_OF_BOOKS_AVAILABLE” (Which are never issued). Hint: The issued books details are available in the LMS_BOOK_ISSUE table
+
+ANS)
+SELECT COUNT(LMS_BOOK_DETAILS.BOOK_CODE)AS NO_OF_BOOKS_AVAILABLE 
+FROM LMS_BOOK_DETAILS  
+LEFT JOIN LMS_BOOK_ISSUE ON LMS_BOOK_DETAILS.BOOK_CODE = LMS_BOOK_ISSUE.BOOK_CODE 
+WHERE LMS_BOOK_ISSUE.BOOK_CODE IS NULL 
+
+Problem # 3:
+a)Write a query to display the member id, member name and total fine amount of the members whose total fine amount is less than 100.
+answer-
+select lms_members.MEMBER_ID, lms_members.MEMBER_NAME, SUM(lms_fine_details.FINE_AMOUNT)
+from lms_members
+inner join lms_book_issue on(lms_members.MEMBER_ID = lms_book_issue.MEMBER_ID)
+inner join lms_fine_details on(lms_book_issue.FINE_RANGE = lms_fine_details.FINE_RANGE)
+group by lms_members.MEMBER_ID, lms_members.MEMBER_NAME
+having SUM(lms_fine_details.FINE_AMOUNT) < 100
+
+b)Write a query to display the member id, member name, fine range and total fine amount of the members whose total fine amount for a given fine range is less than 100.
+Answer-
+select lms_members.MEMBER_ID, lms_members.MEMBER_NAME,lms_fine_details.FINE_RANGE, SUM(lms_fine_details.FINE_AMOUNT)
+from lms_members
+inner join lms_book_issue on(lms_members.MEMBER_ID = lms_book_issue.MEMBER_ID)
+inner join lms_fine_details on(lms_book_issue.FINE_RANGE = lms_fine_details.FINE_RANGE)
+group by lms_members.MEMBER_ID, lms_members.MEMBER_NAME,lms_fine_details.FINE_RANGE
+having SUM(lms_fine_details.FINE_AMOUNT) < 100
+
+c)Write a query to display the member id, member name, fine range and fine amount of the members whose fine amount is less than 100.
+Answer-
+select lms_members.MEMBER_ID, lms_members.MEMBER_NAME,lms_fine_details.FINE_RANGE, lms_fine_details.FINE_AMOUNT
+from lms_members
+inner join lms_book_issue on(lms_members.MEMBER_ID = lms_book_issue.MEMBER_ID)
+inner join lms_fine_details on(lms_book_issue.FINE_RANGE = lms_fine_details.FINE_RANGE)
+where (lms_fine_details.FINE_AMOUNT) < 100
+
+
+<li>Problem # 4:
+Write a query to display the book code, book title, publisher, edition, price and year of publication and sort based on year of publication, publisher and edition.
+
+ANS)
+SELECT BOOK_CODE,BOOK_TITLE,PUBLICATION,BOOK_EDITION,PRICE,PUBLISH_DATE AS YEAR_OF_PUBLICATION FROM LMS_BOOK_DETAILS ORDER BY YEAR_OF_PUBLICATION,PUBLICATION,BOOK_EDITION;
+
+<li>Problem # 5:
+Write a query to display the book code, book title and rack number of the books which are placed in rack 'A1' and sort by book title in ascending order. 
+
+ANS)
+SELECT BOOK_CODE,BOOK_TITLE,RACK_NUM 
+FROM LMS_BOOK_DETAILS 
+WHERE RACK_NUM='A1' 
+ORDER BY BOOK_TITLE ASC
+
+<li>Problem # 6:
+Write a query to display the member id, member name, due date and date returned of the members who has returned the books after the due date. Hint: Date_return is due date and Date_returned is actual book return date. 
+
+ANS)
+SELECT 
+MEMBER_ID,(SELECT MEMBER_NAME FROM LMS_MEMBERS WHERE MEMBER_ID=T1.MEMBER_ID)AS MEMBER_NAME,
+DATE_RETURN AS DUE_DATE,DATE_RETURNED 
+FROM LMS_BOOK_ISSUE T1 
+WHERE DATE_RETURN < DATE_RETURNED
+
+<li>Problem # 7:
+Write a query to display the member id, member name and date of registration who have not taken any book. 
+
+ANS)
+SELECT LMS_MEMBERS.MEMBER_ID,LMS_MEMBERS.MEMBER_NAME,LMS_MEMBERS.DATE_REGISTER 
+FROM LMS_MEMBERS  
+LEFT JOIN LMS_BOOK_ISSUE  ON LMS_MEMBERS.MEMBER_ID = LMS_BOOK_ISSUE.MEMBER_ID 
+WHERE LMS_BOOK_ISSUE.MEMBER_ID IS NULL
+
+
+<li>Problem # 8:
+Write a Query to display the member id and member name of the members who has not paid any fine in the year 2012.
+
+ANS)
+--USING SUB QUERY
+SELECT LMS_BOOK_ISSUE.MEMBER_ID,(SELECT LMS_MEMBERS.MEMBER_NAME FROM LMS_MEMBERS WHERE LMS_BOOK_ISSUE.MEMBER_ID=LMS_MEMBERS.MEMBER_ID)AS MEMBER_NAME 
+FROM LMS_BOOK_ISSUE 
+WHERE LMS_BOOK_ISSUE.DATE_RETURN >=LMS_BOOK_ISSUE.DATE_RETURNED AND LMS_BOOK_ISSUE.DATE_RETURNED NOT LIKE ' 2012% ' OR LMS_BOOK_ISSUE.FINE_RANGE = NULL
+--USING JOIN
+SELECT LMS_BOOK_ISSUE.MEMBER_ID,LMS_MEMBERS.MEMBER_NAME 
+FROM LMS_BOOK_ISSUE  
+JOIN LMS_MEMBERS on LMS_BOOK_ISSUE.MEMBER_ID=LMS_MEMBERS.MEMBER_ID 
+WHERE LMS_BOOK_ISSUE.DATE_RETURN>=LMS_BOOK_ISSUE.DATE_RETURNED AND LMS_BOOK_ISSUE.DATE_RETURNED NOT LIKE ' 2012% ' OR LMS_BOOK_ISSUE.FINE_RANGE = NULL
+
+<li>Problem # 9:
+Write a query to display the date on which the maximum numbers of books were issued and the number of books issued with alias name “NOOFBOOKS”.
+
+ANS)
+select DATE_ISSUE,count(DATE_ISSUE) as NO_OF_BOOKS 
+from LMS_BOOK_ISSUE 
+group by DATE_ISSUE having COUNT(DATE_ISSUE)=(select MAX(counted) from (select COUNT(DATE_ISSUE) as counted from LMS_BOOK_ISSUE group by DATE_ISSUE));
+
+
+<li>Problem # 10:
+Write a query to list the book title and supplier id for the books authored by authors whose name starts with 'H'/'h'  and the book edition is atleast 5 and supplied by supplier ‘S01’/'S02'/'S03'. 
+
+ANS)
+SELECT BOOK_TITLE, SUPPLIER_ID
+FROM lms_book_details
+where (AUTHOR like 'H%' OR AUTHOR like 'h%') and BOOK_EDITION >= 5 AND (SUPPLIER_ID IN('S01','S02','S03'))
